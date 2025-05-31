@@ -1,11 +1,10 @@
-requests
-beautifulsoup4
-pandas
-lxml
-pytest
-responses
-rich
-# tabulate # Optional for alternative table formatting
+Flask==3.1.1
+fastapi==0.115.12
+uvicorn==0.34.2
+pytest==8.3.5
+httpx==0.28.1
+requests==2.32.3
+
 # Optional, as per TDD plan:
 # tenacity
 # typing
