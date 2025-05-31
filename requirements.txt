@@ -1,0 +1,15 @@
+requests
+beautifulsoup4
+pandas
+lxml
+pytest
+responses
+rich
+# tabulate # Optional for alternative table formatting
+# Optional, as per TDD plan:
+# tenacity
+# typing
+# mypy
+# playwright
+# selenium
+# ruff 

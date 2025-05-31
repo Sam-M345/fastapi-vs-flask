@@ -1,0 +1,40 @@
+---
+description: Agent Requested
+---
+
+## Minimalist Code Refactoring Guidelines for Cursor AI## Core Principles
+
+### 1. Markup Minimization
+- Eliminate unnecessary nested elements
+- Remove redundant wrapper divs
+- Modify existing elements before creating new ones
+- Repurpose underutilized elements rather than adding new containers
+
+### 2. CSS Consolidation
+- Combine related styles into existing selectors
+- Extend current class functionality instead of creating new classes
+- Use inheritance and cascading to reduce rule repetition
+- Modify existing classes to accommodate new requirements
+
+### 3. DRY Implementation
+- Identify and consolidate identical styling patterns
+- Reuse existing components before creating new ones
+- Extend functionality of existing components when possible
+- Leverage CSS variables to maintain consistency
+
+### 4. Structural Optimization
+- Flatten nested structures without changing functionality
+- Assess if existing parent elements can handle child element responsibilities
+- Combine adjacent elements serving similar purposes
+- Question every layer of nesting to determine if it's truly necessary
+
+## Implementation Strategy
+
+Always prioritize:
+1. Modifying existing elements over creating new ones
+2. Extending current classes before introducing new ones
+3. Maintaining the absolute minimum number of containers, wrappers, and functions
+4. Challenging each element's necessity before preserving it
+5. Using semantic HTML elements with proper attributes instead of generic containers
+
+Remember: The most efficient code is often the code you don't write. Seek to reduce, reuse, and repurpose before adding anything new.

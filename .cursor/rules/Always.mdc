@@ -1,0 +1,74 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+this part has priority over any other instruction
+
+---
+**HIGH PRIORITY INSTRUCTION:**
+
+**For tasks requiring user input or information gathering:**
+1.  **Assign only ONE step/task at a time.**
+2.  **Wait for the user's response before proceeding.**
+3.  **If the user's response is satisfactory, move to the next step.**
+4.  **If the user's response is inaccurate, explain where and how the correct information can be collected. Do NOT proceed to the next step until accurate information is provided.**
+5.  **NEVER assign more than ONE tasks at once to avoid confusion and inaccurate responses.**
+
+
+---
+description: Keep chat responses concise and actionable; minimize verbosity in the right panel.
+alwaysApply: true
+---
+
+- Only display the most important information and actionable steps in the right panel chat window.
+- Avoid lengthy explanations or verbose responses; focus on what the user needs to do next (e.g., run a command, install a package, check a log).
+- It is acceptable to take extra time to think or process internally, but do not display all your reasoning or intermediate steps unless explicitly requested.
+- Prioritize brevity and clarity. If a response can be summarized, do so.
+- Assume the user prefers minimal reading and does not want to sift through long text.
+- Only elaborate if the user asks for more detail.
+
+
+
+
+1. "Always focus exclusively on the task I've explicitly requested. If you notice other issues in the code, do not attempt to fix them unless I specifically ask."
+
+2. "When making changes, make the minimal edit necessary to accomplish exactly what I've asked for. Do not extend the scope of changes beyond what was requested."
+
+3. "If you notice potential issues unrelated to my request, briefly note them at the end of your response only after completing the requested task, but do not attempt to fix them."
+
+4. "Prioritize completing the specific task over perfecting the entire codebase. One successful focused change is better than trying to fix everything at once."
+
+5. "When in doubt about scope, ask me to clarify rather than making assumptions about what should be changed."
+
+6.ensure you stay laser-focused on the specific request without getting distracted by other issues you may notice in the code.
+
+
+rules:
+  - name: file-size-limit
+    pattern: "**/*.{js,ts,jsx,tsx,py,go,rs,java}"
+    when:
+      lines: ">1000"
+    action: |
+      **Automated File Splitting Protocol**
+      1. Analyze this file's structure and functionality
+      2. Identify logical splitting points (component boundaries, related functions, etc)
+      3. Create new adjacent file with _partX suffix (e.g., `utils_part2.ts`)
+      4. Move 30-40% of code to new file while maintaining functionality
+      5. Add cross-references between original and new files
+      6. Verify imports/exports work across split files
+      
+      If splitting fails after 3 attempts:
+      [FALLBACK] → "This file exceeds 1000 lines. Please manually split it into smaller modules."
+
+  - name: edit-fallback
+    pattern: "**/*"
+    action: |
+      **Change Implementation Protocol**
+      1. Attempt automatic implementation (3 retries)
+      2. If failure persists:
+         a. Display exact code changes needed
+         b. Show line numbers/context
+         c. Provide step-by-step manual implementation guide
+         d. Offer to create TODO comments at affected positions
