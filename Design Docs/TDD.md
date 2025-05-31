@@ -25,9 +25,34 @@ You will build two minimal web servers that respond to `/` after an artificial 3
 
 ---
 
+These project phases are:
+
+Phase 0 — Environment & Repo Skeleton
+......Objective: Setup project environment and repository.
+
+Phase 1 — Red Test for Flask Home Route
+......Objective: Write failing test for Flask server.
+
+Phase 2 — Green Implementation for Flask
+......Objective: Implement Flask server to pass test.
+
+Phase 3 — Red Test for FastAPI Home Route
+......Objective: Write failing test for FastAPI server.
+
+Phase 4 — Green Implementation for FastAPI
+......Objective: Implement FastAPI server to pass test.
+
+Phase 5 — Benchmark Harness (Integration)
+......Objective: Create benchmark script and integration tests.
+
+Phase 6 — Refactor & Documentation
+......Objective: Refactor code and add project documentation.
+
+---
+
 #### 3 Phased Plan
 
-Each phase contains **Objective**, **Tasks**, **Tests (written first)**, and **Expected Result**.
+Each phase contains **Objective**, **Key Tasks**, **Tests (written first)**, and **Expected Result**.
 
 ---
 
@@ -37,21 +62,19 @@ _Objective_
 
 - Isolate project in a virtual environment; create Git repository with CI (GitHub Actions).
 
-_Tasks_
+_Key Tasks_
 
-1. `python -m venv .venv && source .venv/bin/activate`
-2. `pip install flask fastapi uvicorn pytest httpx requests`
-3. Scaffold folders:
-
-   ```
-   project/
-     app_flask/
-     app_fastapi/
-     tests/
-     benchmark/
-   ```
-
-4. Pre-commit hooks for `ruff`/`black`.
+- Set up virtual environment: `python -m venv .venv && source .venv/bin/activate` (or equivalent for OS).
+- Install core dependencies: `pip install flask fastapi uvicorn pytest httpx requests`.
+- Create project directory structure:
+  ```
+  project/
+    app_flask/
+    app_fastapi/
+    tests/
+    benchmark/
+  ```
+- (Optional) Configure pre-commit hooks for `ruff`/`black`.
 
 _Tests_
 
@@ -69,17 +92,23 @@ _Objective_
 
 - Specify behaviour of Flask server before implementation.
 
-_Tasks_
+_Key Tasks_
 
-1. Write failing test `tests/test_flask_route.py`.
+- Write a failing test in `tests/test_flask_route.py` that:
+  - Starts a Flask server (conceptually, on port 5000).
+  - Makes an HTTP GET request to `/`.
+  - Asserts a 200 status code.
+  - Asserts specific HTML content (e.g., "Slow Flask Demo").
+  - Ensures server shutdown.
 
 ```python
+# Example structure for tests/test_flask_route.py
 import httpx
 import subprocess, time, os, signal
 
 def start_server():
-    proc = subprocess.Popen(["python", "-m", "app_flask.app"])
-    time.sleep(0.2)  # allow startup
+    proc = subprocess.Popen(["python", "-m", "app_flask.app"]) # Non-existent app
+    time.sleep(0.2)
     return proc
 
 def test_home_returns_html():
@@ -89,7 +118,7 @@ def test_home_returns_html():
         assert r.status_code == 200
         assert "Slow Flask Demo" in r.text
     finally:
-        os.kill(proc.pid, signal.SIGINT)
+        os.kill(proc.pid, signal.SIGINT) # Or proc.terminate()
 ```
 
 _Actual Result / Verification (Phase 1)_
@@ -129,10 +158,17 @@ _Objective_
 
 - Make the red test pass.
 
-_Tasks_
+_Key Tasks_
+
+- Create `app_flask/app.py` (or `app_flask/flask_application.py` as per actual implementation).
+- Implement a Flask application:
+  - Listens on `/`.
+  - Returns "<h1>Slow Flask Demo</h1>" (or matching text from test).
+  - Includes an artificial `time.sleep(3)`.
+  - Runs on the port expected by the test (e.g., 5000 or 3000).
 
 ```python
-# app_flask/app.py
+# app_flask/app.py (example)
 from flask import Flask, Response
 import time
 
@@ -140,12 +176,12 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    time.sleep(3)                # simulate slow work
+    time.sleep(3)
     html = "<h1>Slow Flask Demo</h1>"
     return Response(html, mimetype="text/html")
 
 if __name__ == "__main__":
-    app.run()
+    app.run(port=5000) # Match test port
 ```
 
 _Tests_
@@ -164,14 +200,23 @@ _Objective_
 
 - Write failing async test that mirrors Flask expectations.
 
-_Tasks_
+_Key Tasks_
+
+- Create `tests/test_fastapi_route.py`.
+- Write a failing `pytest` test using `async` and `httpx.AsyncClient`:
+  - Starts a FastAPI server using `uvicorn` (conceptually, on port 8000).
+  - Makes an HTTP GET request to `/`.
+  - Asserts a 200 status code.
+  - Asserts specific HTML content (e.g., "Slow FastAPI Demo").
+  - Ensures server shutdown.
 
 ```python
-# tests/test_fastapi_route.py
+# tests/test_fastapi_route.py (example)
 import httpx, subprocess, asyncio, os, signal, time
+import pytest
 
 async def start_server():
-    proc = subprocess.Popen(["uvicorn", "app_fastapi.app:app"])
+    proc = subprocess.Popen(["uvicorn", "app_fastapi.app:app", "--port", "8000"]) # Non-existent app
     await asyncio.sleep(0.2)
     return proc
 
@@ -184,12 +229,12 @@ async def test_home_returns_html():
             assert r.status_code == 200
             assert "Slow FastAPI Demo" in r.text
     finally:
-        os.kill(proc.pid, signal.SIGINT)
+        os.kill(proc.pid, signal.SIGINT) # Or proc.terminate()
 ```
 
 _Expected Result_
 
-- Test fails (❌ **red**).
+- Test fails (❌ **red**), likely due to connection error as `app_fastapi/app.py` is not yet created.
 
 ---
 
@@ -199,10 +244,17 @@ _Objective_
 
 - Pass the FastAPI test using non-blocking delay.
 
-_Tasks_
+_Key Tasks_
+
+- Create `app_fastapi/app.py`.
+- Implement a FastAPI application:
+  - Listens on `/`.
+  - Returns "<h1>Slow FastAPI Demo</h1>" (or matching text from test).
+  - Includes an artificial `await asyncio.sleep(3)` (non-blocking).
+  - Ensure `uvicorn` runs it on the port expected by the test (e.g., 8000).
 
 ```python
-# app_fastapi/app.py
+# app_fastapi/app.py (example)
 from fastapi import FastAPI, Response
 import asyncio
 
@@ -210,14 +262,16 @@ app = FastAPI()
 
 @app.get("/")
 async def home():
-    await asyncio.sleep(3)                    # simulate slow work (non-blocking)
+    await asyncio.sleep(3)
     html = "<h1>Slow FastAPI Demo</h1>"
     return Response(content=html, media_type="text/html")
+
+# Uvicorn will run this: uvicorn app_fastapi.app:app --port 8000
 ```
 
 _Tests_
 
-- Run `pytest -q`; both test suites should pass.
+- Run `pytest -q`; both test suites (Flask & FastAPI) should pass.
 
 _Expected Result_
 
@@ -231,39 +285,43 @@ _Objective_
 
 - Produce reproducible timing of 100 concurrent requests against each server.
 
-_Tasks_
+_Key Tasks_
 
-1. Write script `benchmark/run_benchmark.py`.
-2. Parametrise for framework (`flask` or `fastapi`).
-3. For Flask: spawn 100 threads calling `requests.get`.
-4. For FastAPI: spawn 100 asynchronous tasks using `httpx.AsyncClient`.
-5. Record `time.perf_counter()` start/stop.
-6. Output aggregate wall-clock seconds and simple histogram (optional).
+- Create script `benchmark/run_benchmark.py`.
+- Parameterize script for framework (`flask` or `fastapi`).
+- Implement Flask benchmark:
+  - Use `concurrent.futures.ThreadPoolExecutor` to spawn 100 threads.
+  - Each thread calls `requests.get` to the Flask server's endpoint.
+- Implement FastAPI benchmark:
+  - Use `asyncio.gather` with `httpx.AsyncClient` to make 100 concurrent requests.
+- Record and output total wall-clock time for each framework using `time.perf_counter()`.
+- (Optional) Output a simple histogram of request times.
 
 _Tests_
 
-- **Integration**: add `tests/test_benchmark.py` that asserts:
-  _Flask total time > 3 seconds_ (likely \~≥ 3 s × ceil(100/threads*per_worker)).
-  \_FastAPI total time ≈ 3–4 seconds* (all tasks awaited concurrently).
-  Accept generous tolerance (±1 s) to avoid flaky CI.
+- **Integration Test**: Create `tests/test_benchmark.py`.
 
-```python
-def test_fastapi_faster():
-    flask_time = run_once("flask")
-    fast_time = run_once("fastapi")
-    assert fast_time < flask_time
-```
+  - Assert that Flask total time > 3 seconds (actual time depends on concurrency).
+  - Assert that FastAPI total time ≈ 3–4 seconds (more truly concurrent).
+  - Add a test `test_fastapi_faster()`:
+
+    ```python
+    def test_fastapi_faster():
+        flask_time = run_once("flask") # Assumes run_once executes the benchmark
+        fast_time = run_once("fastapi")
+        assert fast_time < flask_time
+    ```
+
+  - Use generous time tolerances (e.g., ±1 s) for CI stability.
 
 _Expected Result_
 
-- Benchmark script prints e.g.
-
-```
-Flask  (100 req): 18.4 s
-FastAPI(100 req):  3.7 s
-```
-
-- Test asserting relative performance passes.
+- Benchmark script prints comparative timings, e.g.:
+  ```
+  Flask  (100 req): 18.4 s
+  FastAPI(100 req):  3.7 s
+  ```
+- Integration test asserting relative performance passes.
 
 ---
 
@@ -273,22 +331,30 @@ _Objective_
 
 - Clean code, extract common settings, add README & docstrings.
 
-_Tasks_
+_Key Tasks_
 
-1. Factor out "HTML template" constant.
-2. Use environment variables for port numbers.
-3. Add `requirements.txt` & `make start_flask` / `make start_fastapi`.
-4. Write tutorial in `docs/` explaining how asynchronous I/O yields throughput gains.
+- Refactor code:
+  - Extract common HTML template string into a constant if used in multiple places.
+  - Consider using environment variables or a config file for port numbers.
+- Create `requirements.txt`: `pip freeze > requirements.txt`.
+- (Optional) Add convenience scripts/Makefile targets (e.g., `make start_flask`).
+- Write a tutorial in `docs/` (or update README.md) explaining:
+  - How to run the servers and benchmark.
+  - The concepts of synchronous vs. asynchronous I/O.
+  - How the benchmark results demonstrate throughput gains with async.
+- Add docstrings to functions and modules.
 
 _Tests_
 
-- Static analysis (`ruff`, `black`), docs build passes.
-- Re-run full `pytest`; no regressions.
+- Run static analysis (e.g., `ruff`, `black`).
+- (If applicable) Ensure documentation builds successfully.
+- Re-run full `pytest` suite to check for regressions.
 
 _Expected Result_
 
 - CI matrix (Linux, macOS, Windows) all green.
-- Students understand sync vs async latency differences through quantitative evidence.
+- Project is well-documented and easy for students to understand and run.
+- Students understand sync vs. async latency/throughput differences through quantitative evidence.
 
 ---
 
