@@ -1,17 +1,17 @@
 ### Technical Design Document (TDD)
 
-**Project — Flask vs FastAPI “Slow-Request” Benchmark**
-*(Target audience: Python programming students; methodology: Test-Driven Development)*
+**Project — Flask vs FastAPI "Slow-Request" Benchmark**
+_(Target audience: Python programming students; methodology: Test-Driven Development)_
 
 ---
 
-#### 1  Overview & Scope
+#### 1 Overview & Scope
 
-You will build two minimal web servers that respond to `/` after an artificial 3-second delay, then write an automated benchmark that fires 100 requests and records the total wall-clock time for each framework.  Development follows classic TDD: **red → green → refactor**.
+You will build two minimal web servers that respond to `/` after an artificial 3-second delay, then write an automated benchmark that fires 100 requests and records the total wall-clock time for each framework. Development follows classic TDD: **red → green → refactor**.
 
 ---
 
-#### 2  Technology Stack
+#### 2 Technology Stack
 
 | Layer                           | Choice                                                                       | Rationale                                              |
 | ------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
@@ -25,7 +25,7 @@ You will build two minimal web servers that respond to `/` after an artificial 3
 
 ---
 
-#### 3  Phased Plan
+#### 3 Phased Plan
 
 Each phase contains **Objective**, **Tasks**, **Tests (written first)**, and **Expected Result**.
 
@@ -33,11 +33,11 @@ Each phase contains **Objective**, **Tasks**, **Tests (written first)**, and **E
 
 ##### **Phase 0 — Environment & Repo Skeleton**
 
-*Objective*
+_Objective_
 
-* Isolate project in a virtual environment; create Git repository with CI (GitHub Actions).
+- Isolate project in a virtual environment; create Git repository with CI (GitHub Actions).
 
-*Tasks*
+_Tasks_
 
 1. `python -m venv .venv && source .venv/bin/activate`
 2. `pip install flask fastapi uvicorn pytest httpx requests`
@@ -50,25 +50,26 @@ Each phase contains **Objective**, **Tasks**, **Tests (written first)**, and **E
      tests/
      benchmark/
    ```
+
 4. Pre-commit hooks for `ruff`/`black`.
 
-*Tests*
+_Tests_
 
-* **None** (meta-phase) — verify by `pytest -q` returning *collected 0 items*.
+- **None** (meta-phase) — verify by `pytest -q` returning _collected 0 items_.
 
-*Expected Result*
+_Expected Result_
 
-* Clean repo, `pytest` runs successfully (0 tests).
+- Clean repo, `pytest` runs successfully (0 tests).
 
 ---
 
 ##### **Phase 1 — Red Test for Flask Home Route**
 
-*Objective*
+_Objective_
 
-* Specify behaviour of Flask server before implementation.
+- Specify behaviour of Flask server before implementation.
 
-*Tasks*
+_Tasks_
 
 1. Write failing test `tests/test_flask_route.py`.
 
@@ -91,19 +92,44 @@ def test_home_returns_html():
         os.kill(proc.pid, signal.SIGINT)
 ```
 
-*Expected Result*
+_Actual Result / Verification (Phase 1)_
 
-* `pytest` fails with *ConnectionError* (❌ **red**) because server not yet written.
+To verify the "red" state, the following command was run from the project root after activating the virtual environment (`.\.venv\Scripts\activate`):
+
+```bash
+.\.venv\Scripts\python.exe -m pytest -p no:all
+```
+
+The terminal output included:
+
+```
+=========================================== short test summary info ============================================
+FAILED project/tests/test_flask_route.py::test_home_returns_html - httpx.ConnectError: [WinError 10061] No con
+nection could be made because the target machine actively refused it
+============================================== 1 failed in X.XXs ===============================================
+```
+
+And the captured stderr showed:
+
+```
+C:\Users\Sam\AppData\Local\Programs\Python\Python312\python.exe: No module named project.app_flask.app
+```
+
+_Indications:_
+
+- The `httpx.ConnectError` confirmed that the test failed because the HTTP server at `http://127.0.0.1:5000/` was not running or reachable.
+- The `stderr` message `No module named project.app_flask.app` confirmed that the Flask application code had not yet been created.
+- This aligns with the TDD expectation of a "red" test because the server is not yet written.
 
 ---
 
 ##### **Phase 2 — Green Implementation for Flask**
 
-*Objective*
+_Objective_
 
-* Make the red test pass.
+- Make the red test pass.
 
-*Tasks*
+_Tasks_
 
 ```python
 # app_flask/app.py
@@ -122,23 +148,23 @@ if __name__ == "__main__":
     app.run()
 ```
 
-*Tests*
+_Tests_
 
-* Re-run `pytest -q`.
+- Re-run `pytest -q`.
 
-*Expected Result*
+_Expected Result_
 
-* Test passes (✅ **green**).  Refactor if desired (logging, config).
+- Test passes (✅ **green**). Refactor if desired (logging, config).
 
 ---
 
 ##### **Phase 3 — Red Test for FastAPI Home Route**
 
-*Objective*
+_Objective_
 
-* Write failing async test that mirrors Flask expectations.
+- Write failing async test that mirrors Flask expectations.
 
-*Tasks*
+_Tasks_
 
 ```python
 # tests/test_fastapi_route.py
@@ -161,19 +187,19 @@ async def test_home_returns_html():
         os.kill(proc.pid, signal.SIGINT)
 ```
 
-*Expected Result*
+_Expected Result_
 
-* Test fails (❌ **red**).
+- Test fails (❌ **red**).
 
 ---
 
 ##### **Phase 4 — Green Implementation for FastAPI**
 
-*Objective*
+_Objective_
 
-* Pass the FastAPI test using non-blocking delay.
+- Pass the FastAPI test using non-blocking delay.
 
-*Tasks*
+_Tasks_
 
 ```python
 # app_fastapi/app.py
@@ -189,23 +215,23 @@ async def home():
     return Response(content=html, media_type="text/html")
 ```
 
-*Tests*
+_Tests_
 
-* Run `pytest -q`; both test suites should pass.
+- Run `pytest -q`; both test suites should pass.
 
-*Expected Result*
+_Expected Result_
 
-* All unit tests green.  Total runtime still quick because delay happens only once per request, not per test.
+- All unit tests green. Total runtime still quick because delay happens only once per request, not per test.
 
 ---
 
 ##### **Phase 5 — Benchmark Harness (Integration)**
 
-*Objective*
+_Objective_
 
-* Produce reproducible timing of 100 concurrent requests against each server.
+- Produce reproducible timing of 100 concurrent requests against each server.
 
-*Tasks*
+_Tasks_
 
 1. Write script `benchmark/run_benchmark.py`.
 2. Parametrise for framework (`flask` or `fastapi`).
@@ -214,11 +240,11 @@ async def home():
 5. Record `time.perf_counter()` start/stop.
 6. Output aggregate wall-clock seconds and simple histogram (optional).
 
-*Tests*
+_Tests_
 
-* **Integration**: add `tests/test_benchmark.py` that asserts:
-  *Flask total time > 3 seconds* (likely \~≥ 3 s × ceil(100/threads\_per\_worker)).
-  *FastAPI total time ≈ 3–4 seconds* (all tasks awaited concurrently).
+- **Integration**: add `tests/test_benchmark.py` that asserts:
+  _Flask total time > 3 seconds_ (likely \~≥ 3 s × ceil(100/threads*per_worker)).
+  \_FastAPI total time ≈ 3–4 seconds* (all tasks awaited concurrently).
   Accept generous tolerance (±1 s) to avoid flaky CI.
 
 ```python
@@ -228,48 +254,48 @@ def test_fastapi_faster():
     assert fast_time < flask_time
 ```
 
-*Expected Result*
+_Expected Result_
 
-* Benchmark script prints e.g.
+- Benchmark script prints e.g.
 
 ```
 Flask  (100 req): 18.4 s
 FastAPI(100 req):  3.7 s
 ```
 
-* Test asserting relative performance passes.
+- Test asserting relative performance passes.
 
 ---
 
 ##### **Phase 6 — Refactor & Documentation**
 
-*Objective*
+_Objective_
 
-* Clean code, extract common settings, add README & docstrings.
+- Clean code, extract common settings, add README & docstrings.
 
-*Tasks*
+_Tasks_
 
-1. Factor out “HTML template” constant.
+1. Factor out "HTML template" constant.
 2. Use environment variables for port numbers.
 3. Add `requirements.txt` & `make start_flask` / `make start_fastapi`.
 4. Write tutorial in `docs/` explaining how asynchronous I/O yields throughput gains.
 
-*Tests*
+_Tests_
 
-* Static analysis (`ruff`, `black`), docs build passes.
-* Re-run full `pytest`; no regressions.
+- Static analysis (`ruff`, `black`), docs build passes.
+- Re-run full `pytest`; no regressions.
 
-*Expected Result*
+_Expected Result_
 
-* CI matrix (Linux, macOS, Windows) all green.
-* Students understand sync vs async latency differences through quantitative evidence.
+- CI matrix (Linux, macOS, Windows) all green.
+- Students understand sync vs async latency differences through quantitative evidence.
 
 ---
 
-#### 4  Open Questions
+#### 4 Open Questions
 
 1. **Concurrency level** — should benchmark cap threads at CPU-count × N or always 100?
 2. **CI resources** — GitHub Actions offers limited RAM; long benchmarks may time-out.
 3. **Optional extras** — Would you like to visualise results (matplotlib bar chart) or stick to plain text?
 
-Let me know if any of the open questions need refinement before you start coding — otherwise you can begin with *Phase 0* and run the initial (failing) Flask test.
+Let me know if any of the open questions need refinement before you start coding — otherwise you can begin with _Phase 0_ and run the initial (failing) Flask test.
