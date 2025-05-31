@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route("/")
 def home():
     time.sleep(3)                # simulate slow work
-    html = "Hello from Flask :)"
+    html = "<h1>Slow Flask Demo</h1>" # TDD Phase 2 content
     return Response(html, mimetype="text/html")
 
 if __name__ == "__main__":
@@ -18,4 +18,4 @@ if __name__ == "__main__":
     # Open the URL in a new browser tab
     webbrowser.open_new_tab(url)
     
-    app.run(host=host, port=port) 
+    app.run(host="0.0.0.0", port=3000) 
