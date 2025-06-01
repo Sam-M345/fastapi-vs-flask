@@ -30,21 +30,17 @@ def run_flask_benchmark():
     successful_so_far = 0
 
     for i in range(NUM_REQUESTS):
-        print(f"[DIAG-BRB-FLASK] Processing request {i+1}/{NUM_REQUESTS}", flush=True)
         try:
             status_code = fetch_url_sync(FLASK_URL) # Direct call
+            print(f"REQ_STATUS:{status_code}", flush=True) # New progress line
             results_list.append(status_code)
             if status_code == 200:
                 successful_so_far += 1
-            print(f"[DIAG-BRB-FLASK] Request {i+1} result: {status_code}", flush=True)
+            print(f"[DIAG-BRB-FLASK] Request {i+1}/{NUM_REQUESTS} result: {status_code}", flush=True)
         except Exception as e:
-            print(f"[DIAG-BRB-FLASK] Request {i+1} generated an exception: {e}", flush=True)
+            print(f"[DIAG-BRB-FLASK] Request {i+1}/{NUM_REQUESTS} failed with exception: {e}", flush=True)
             results_list.append(None)
 
-        if (i + 1) % 10 == 0 and (i + 1) < NUM_REQUESTS:
-            print(f"Flask progress: Handled {i+1}/{NUM_REQUESTS} requests... ({successful_so_far} successful so far)")
-            sys.stdout.flush()
-    
     end_time = time.perf_counter()
     total_time = end_time - start_time
     successful_requests = sum(1 for r in results_list if r == 200)
