@@ -6,6 +6,7 @@ import uvicorn
 import threading
 import time
 from multiprocessing import Process # Using Process for better isolation
+import os
 
 # Server configuration
 HOST = "127.0.0.1"
@@ -30,12 +31,16 @@ class UvicornServer(threading.Thread):
     # UvicornServer using Process for cleaner start/stop
     # This might be more robust for test isolation.
 
-def run_server_process(app_module_str, host, port):
+def run_server_process(app_module_str, host, port, project_root_dir):
+    # Add project root to Python path for the new process
+    import sys
+    sys.path.insert(0, project_root_dir)
     uvicorn.run(app_module_str, host=host, port=port, log_level="warning")
 
 async def start_server_fastapi():
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     # Using Process to run Uvicorn. This provides better isolation and cleanup.
-    proc = Process(target=run_server_process, args=("app_fastapi.app:app", HOST, PORT), daemon=True)
+    proc = Process(target=run_server_process, args=("app_fastapi.app:app", HOST, PORT, project_root), daemon=True)
     proc.start()
     await asyncio.sleep(2.0) # Increased sleep to ensure server is fully up
     if not proc.is_alive():
