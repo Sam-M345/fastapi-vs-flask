@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 # Server URLs (ensure these match your running servers)
 FLASK_URL = "http://127.0.0.1:3000/"
 FASTAPI_URL = "http://127.0.0.1:8000/"
-NUM_REQUESTS = 100
+NUM_REQUESTS = 1
 
 def fetch_url_sync(url):
     try:
