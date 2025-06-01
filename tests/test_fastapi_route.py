@@ -49,7 +49,7 @@ async def test_home_returns_html_fastapi():
         async with httpx.AsyncClient(timeout=10) as client:
             r = await client.get(f"http://{HOST}:{PORT}/")
             assert r.status_code == 200
-            assert "<h1>FastAPI Server: 3s Artificial Delay Demo</h1>" in r.text # Expected content
+            assert "<h1>FastAPI Server: 3-Seconds Artificial Delay Demo</h1>" in r.text # Expected content
     finally:
         if server_process and server_process.is_alive():
             server_process.terminate() # Send SIGTERM

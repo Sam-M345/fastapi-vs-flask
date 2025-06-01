@@ -253,7 +253,7 @@ _Key Tasks_
   - Includes an artificial `await asyncio.sleep(3)` (non-blocking).
   - Ensure `uvicorn` runs it on the port expected by the test (e.g., 8000).
 
-```python
+````python
 # app_fastapi/app.py (example)
 from fastapi import FastAPI, Response
 import asyncio
@@ -266,8 +266,10 @@ async def home():
     html = "<h1>Slow FastAPI Demo</h1>"
     return Response(content=html, media_type="text/html")
 
-# Uvicorn will run this: uvicorn app_fastapi.app:app --port 8000
-```
+To run this FastAPI server manually from your project root (after ensuring `uvicorn` and `fastapi` are installed in your environment), use the following command:
+```bash
+uvicorn app_fastapi.app:app --host 127.0.0.1 --port 8000
+````
 
 _Tests_
 
