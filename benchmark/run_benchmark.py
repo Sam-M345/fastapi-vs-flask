@@ -9,11 +9,11 @@ from concurrent.futures import ThreadPoolExecutor
 # Server URLs (ensure these match your running servers)
 FLASK_URL = "http://127.0.0.1:3000/"
 FASTAPI_URL = "http://127.0.0.1:8000/"
-NUM_REQUESTS = 1
+NUM_REQUESTS = 100
 
 def fetch_url_sync(url):
     try:
-        response = requests.get(url, timeout=10) # Increased timeout for potentially slow server
+        response = requests.get(url) # REMOVED timeout=10
         response.raise_for_status() # Raise an exception for bad status codes
         return response.status_code
     except requests.exceptions.RequestException as e:
