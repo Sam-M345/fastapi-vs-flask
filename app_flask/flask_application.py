@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route("/")
 def home():
     time.sleep(3)                # simulate slow work
-    html = "<h1>Slow Flask Demo</h1>" # TDD Phase 2 content
+    html = "<h1>Flask Server: 3s Artificial Delay Demo</h1>" # Updated content
     return Response(html, mimetype="text/html")
 
 if __name__ == "__main__":

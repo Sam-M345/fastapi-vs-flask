@@ -27,7 +27,7 @@ def test_home_returns_html():
         }
         r = httpx.get("http://127.0.0.1:3000/", timeout=10, headers=headers)
         assert r.status_code == 200
-        assert "<h1>Slow Flask Demo</h1>" in r.text
+        assert "<h1>Flask Server: 3s Artificial Delay Demo</h1>" in r.text
     finally:
         proc.terminate()
         try:
