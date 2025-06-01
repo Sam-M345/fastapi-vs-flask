@@ -16,7 +16,7 @@ def home():
     start_time = datetime.now()
     print(f"[Flask Server] Request {request_id} received at {start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}")
     
-    time.sleep(3)                # simulate slow work
+    time.sleep(0.3)                # simulate slow work
     
     end_time = datetime.now()
     processing_time = (end_time - start_time).total_seconds()
