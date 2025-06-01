@@ -36,7 +36,7 @@ def run_flask_benchmark():
 
 async def fetch_url_async(client, url):
     try:
-        response = await client.get(url, timeout=10) # Increased timeout
+        response = await client.get(url) # REMOVED timeout=10
         response.raise_for_status()
         return response.status_code
     except httpx.RequestError as e:
