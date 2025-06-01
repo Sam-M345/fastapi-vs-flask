@@ -11,11 +11,11 @@ def home():
     return Response(html, mimetype="text/html")
 
 if __name__ == "__main__":
-    host = "127.0.0.1"
-    port = 3000
-    url = f"http://{host}:{port}/"
+    # host = "127.0.0.1" # Not strictly needed for app.run with 0.0.0.0
+    # port = 3000       # Port is defined in app.run
+    # url = f"http://{host}:{port}/" # Not needed as webbrowser call is removed
     
-    # Open the URL in a new browser tab
-    webbrowser.open_new_tab(url)
+    # Open the URL in a new browser tab # THIS LINE WILL BE REMOVED
+    # webbrowser.open_new_tab(url) # REMOVED
     
-    app.run(host="0.0.0.0", port=3000) 
+    app.run(host="0.0.0.0", port=3000) # Port 3000 
