@@ -205,7 +205,7 @@ SCENARIOS = [
     },
     {
         "name": "Flask",
-        "config": "Single-threaded",
+        "config": "Single-threaded, synchronous",
         "delay": "0.3 s time.sleep",
         "cmd": [PYTHON_EXE, "app_flask/flask_application.py"],
         "url": FLASK_SERVER_URL,
