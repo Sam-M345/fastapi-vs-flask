@@ -236,8 +236,8 @@ if __name__ == "__main__":
                 try:
                     console.print(f"[blue]Opening {sc['name']} page at {sc['url']} in browser...[/blue]")
                     webbrowser.open(sc["url"])
-                    console.print(f"[blue]Keeping server alive for 5 seconds to view the page...[/blue]")
-                    time.sleep(5)  # Keep server alive for 5 seconds
+                    console.print(f"[blue]Keeping server alive for 2 seconds to view the page...[/blue]")
+                    time.sleep(2)  # Keep server alive for 2 seconds
                 except Exception as e:
                     console.print(f"[yellow]Could not open browser for {sc['name']}: {e}[/yellow]")
         finally:
