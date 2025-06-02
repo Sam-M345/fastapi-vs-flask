@@ -1,3 +1,11 @@
+ControlAltPete — 5/28/2025 1:38 AM
+
+Pythonistas: Your challenge for this week is... write a Python Flask web server that can handle requests for a home page at @route('/') and will simulate a slow request with time.sleep(3) then return a sample HTML page.
+
+Also write a Python FastAPI web server that handles the same request and does asyncio.sleep(3) then returns a sample HTML page. Finally write a script (Python or shell) to request 100 pages from your web server on http://localhost and time how long it takes for your two different web servers to handle all 100 requests.
+
+##########################################
+
 ### Technical Design Document (TDD)
 
 **Project — Flask vs FastAPI "Slow-Request" Benchmark**
