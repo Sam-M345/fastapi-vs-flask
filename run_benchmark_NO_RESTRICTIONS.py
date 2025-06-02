@@ -142,6 +142,15 @@ def run_benchmark_script(framework_arg):
                         final_summary_line = line
                         if progress_line_printed:
                             print("\r" + " " * 80 + "\r", end="", flush=True)
+                    else:
+                        # Print any other lines from the subprocess (e.g., error messages)
+                        if progress_line_printed:
+                            # Clear the progress line before printing the unexpected line
+                            print("\r" + " " * 80 + "\r", end="", flush=True)
+                        print(line, flush=True) # Print the actual error line
+                        if progress_line_printed:
+                            # Reprint the progress line after the error line
+                            print(f"\rFastAPI progress: Completed {requests_done_count}/{NUM_REQUESTS_EXPECTED} tasks...", end="", flush=True)
 
                 process.stdout.close()
             
