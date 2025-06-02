@@ -2,6 +2,7 @@ import subprocess
 import time
 import re
 import requests  # pip install requests
+import webbrowser # Added import
 from rich.console import Console
 from rich.table import Table
 import sys
@@ -231,6 +232,14 @@ if __name__ == "__main__":
             if parsed:
                 results.append({"framework": sc["name"], "config": sc["config"],
                                 "delay": sc["delay"], **parsed})
+                # Open browser after benchmark completes to avoid interference
+                try:
+                    console.print(f"[blue]Opening {sc['name']} page at {sc['url']} in browser...[/blue]")
+                    webbrowser.open(sc["url"])
+                    console.print(f"[blue]Keeping server alive for 5 seconds to view the page...[/blue]")
+                    time.sleep(5)  # Keep server alive for 5 seconds
+                except Exception as e:
+                    console.print(f"[yellow]Could not open browser for {sc['name']}: {e}[/yellow]")
         finally:
             stop_server(srv, sc["name"])
         console.print()
