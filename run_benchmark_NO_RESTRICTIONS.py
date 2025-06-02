@@ -12,7 +12,7 @@ import os
 FLASK_SERVER_URL = "http://127.0.0.1:3000/"
 FASTAPI_SERVER_URL = "http://127.0.0.1:8000/"
 BENCHMARK_SCRIPT_PATH = "benchmark/run_benchmark.py"  # This script sends requests, delays are in apps
-NUM_REQUESTS_EXPECTED = 1000
+NUM_REQUESTS_EXPECTED = 10000
 PYTHON_EXE = sys.executable
 
 # ------------------------------------------------------------------------
@@ -108,25 +108,79 @@ def run_benchmark_script(framework_arg):
             console.print(f"[red]Error running Popen benchmark for {framework_arg}: {e}[/red]")
             return None
     else: # For FastAPI
+        final_summary_line = None
+        requests_done_count = 0
+        progress_line_printed = False
         try:
-            result = subprocess.run(cmd, text=True, capture_output=True, timeout=600, check=False, encoding='utf-8')
-            if result.returncode != 0:
-                console.print(f"[red]{framework_arg} benchmark failed with subprocess.run.[/red]")
-                if result.stderr: console.print(f"STDERR:\n{result.stderr.strip()}")
+            # Ensure encoding is specified for Popen for consistent text handling
+            process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, bufsize=1, universal_newlines=True, encoding='utf-8')
+            
+            if process.stdout:
+                for line in iter(process.stdout.readline, ''):
+                    line = line.strip()
+                    if not line: 
+                        continue
+
+                    if line.startswith("REQ_STATUS:FASTAPI_TASK_LAUNCHED_"):
+                        # Extract count if needed, or just increment
+                        # current_task_num_str = line.split('_')[-1]
+                        # requests_done_count = int(current_task_num_str)
+                        requests_done_count += 1 # Increment for each launched task
+                        # Using carriage return to update the line in place
+                        print(f"\rFastAPI progress: Launched {requests_done_count}/{NUM_REQUESTS_EXPECTED} tasks...", end="", flush=True)
+                        progress_line_printed = True
+                    elif line.startswith("[DIAG-BRB-FASTAPI]"): # Placeholder for potential future diagnostics
+                        if progress_line_printed:
+                            print("\r" + " " * 80 + "\r", end="", flush=True) 
+                        print(line, flush=True)
+                        if progress_line_printed:
+                            print(f"\rFastAPI progress: Launched {requests_done_count}/{NUM_REQUESTS_EXPECTED} tasks...", end="", flush=True)
+                    elif "FastAPI benchmark:" in line: # Updated to match FastAPI summary line
+                        final_summary_line = line
+                        if progress_line_printed:
+                            print("\r" + " " * 80 + "\r", end="", flush=True)
+
+                process.stdout.close()
+            
+            if progress_line_printed and not final_summary_line:
+                 print("\r" + " " * 80 + "\r", end="", flush=True)
+
+            stderr_output_list = []
+            if process.stderr:
+                for line in iter(process.stderr.readline, ''):
+                    line = line.strip()
+                    if line:
+                        stderr_output_list.append(line)
+                process.stderr.close()
+
+            process.wait(timeout=600) # Keep existing timeout
+
+            if process.returncode != 0:
+                console.print(f"[red]{framework_arg} benchmark script failed with return code {process.returncode}[/red]")
+                if stderr_output_list:
+                    console.print("[red]STDERR:[/red]")
+                    for err_line in stderr_output_list:
+                        console.print(f"[red]{err_line}[/red]")
                 return None
-            if result.stdout and result.stdout.strip():
-                lines = result.stdout.strip().splitlines()
-                if lines: return lines[-1]
-                else: console.print(f"[red]No stdout lines from {framework_arg}.[/red]"); return None
+            
+            if final_summary_line:
+                return final_summary_line
             else:
-                console.print(f"[red]No stdout from {framework_arg}.[/red]")
-                if result.stderr and result.stderr.strip(): console.print(f"STDERR:\n{result.stderr.strip()}")
+                console.print(f"[red]Could not find the final summary line for {framework_arg} in Popen benchmark output.[/red]")
+                if stderr_output_list:
+                    console.print("[red]STDERR output during Popen execution was:[/red]")
+                    for err_line in stderr_output_list:
+                        console.print(f"[red]{err_line}[/red]")
                 return None
+
         except subprocess.TimeoutExpired:
-            console.print(f"[red]Benchmark for {framework_arg} (subprocess.run) timed out.[/red]")
+            console.print(f"[red]Benchmark for {framework_arg} (Popen path) timed out.[/red]")
+            if process.poll() is None: 
+                process.kill()
+                process.wait()
             return None
         except Exception as e:
-            console.print(f"[red]Error running subprocess.run benchmark for {framework_arg}: {e}[/red]")
+            console.print(f"[red]An unexpected error occurred while running Popen benchmark for {framework_arg}: {e}[/red]")
             return None
 
 def parse_benchmark(line):

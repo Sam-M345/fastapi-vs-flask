@@ -60,8 +60,12 @@ async def run_fastapi_benchmark_async(num_requests):
     print(f"Starting FastAPI benchmark: {num_requests} requests to {FASTAPI_URL}...")
     start_time = time.perf_counter()
     
+    tasks = []
     async with httpx.AsyncClient() as client:
-        tasks = [fetch_url_async(client, FASTAPI_URL) for _ in range(num_requests)]
+        for i in range(num_requests):
+            tasks.append(fetch_url_async(client, FASTAPI_URL))
+            # Print status for each request initiated
+            print(f"REQ_STATUS:FASTAPI_TASK_LAUNCHED_{i+1}", flush=True)
         results = await asyncio.gather(*tasks)
     
     end_time = time.perf_counter()
