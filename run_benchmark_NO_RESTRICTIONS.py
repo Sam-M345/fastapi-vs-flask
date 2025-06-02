@@ -156,10 +156,10 @@ def display_table(rows):
 SCENARIOS = [
     {
         "name": "FastAPI (No Delay)",
-        "config": "Uvicorn, async (default)",
+        "config": "Uvicorn, async (41 workers)",
         "delay": "None",
         "cmd": ["uvicorn", "app_fastapi.app_no_delay:app", "--host", "0.0.0.0",
-                "--port", "8000", "--log-level", "warning"],
+                "--port", "8000", "--log-level", "warning", "--workers", "41"],
         "url": FASTAPI_SERVER_URL,
         "bench_arg": "fastapi", # benchmark/run_benchmark.py uses this to pick the URL/method
     },
