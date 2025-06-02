@@ -59,18 +59,30 @@ async def fetch_url_async(client, url):
 async def run_fastapi_benchmark_async(num_requests):
     print(f"Starting FastAPI benchmark: {num_requests} requests to {FASTAPI_URL}...")
     start_time = time.perf_counter()
+    results_list = [] # To store results for final count
     
-    tasks = []
     async with httpx.AsyncClient() as client:
-        for i in range(num_requests):
-            tasks.append(fetch_url_async(client, FASTAPI_URL))
-            # Print status for each request initiated
-            print(f"REQ_STATUS:FASTAPI_TASK_LAUNCHED_{i+1}", flush=True)
-        results = await asyncio.gather(*tasks)
+        tasks = [fetch_url_async(client, FASTAPI_URL) for _ in range(num_requests)]
+        # Print a message indicating all tasks are launched and now awaiting completion.
+        # This might be redundant if the parent script already says "launched X/X tasks"
+        # but can be useful for the benchmark script's own log.
+        # print(f"FASTAPI_INFO: All {num_requests} tasks launched, awaiting completion...", flush=True)
+        
+        completed_count = 0
+        for i, task_future in enumerate(asyncio.as_completed(tasks)):
+            try:
+                result = await task_future
+                results_list.append(result)
+            except Exception as e:
+                # print(f"FASTAPI_TASK_ERROR: Task {i+1} failed with {e}", flush=True) # Optional: log task errors
+                results_list.append(None) # Mark as failed
+            finally:
+                completed_count += 1
+                print(f"REQ_STATUS:FASTAPI_TASK_COMPLETED_{completed_count}", flush=True)
     
     end_time = time.perf_counter()
     total_time = end_time - start_time
-    successful_requests = sum(1 for r in results if r == 200)
+    successful_requests = sum(1 for r in results_list if r == 200)
     print(f"FastAPI benchmark: {successful_requests}/{num_requests} successful requests in {total_time:.2f} seconds.")
     return total_time
 

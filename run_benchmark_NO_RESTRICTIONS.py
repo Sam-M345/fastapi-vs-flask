@@ -12,7 +12,7 @@ import os
 FLASK_SERVER_URL = "http://127.0.0.1:3000/"
 FASTAPI_SERVER_URL = "http://127.0.0.1:8000/"
 BENCHMARK_SCRIPT_PATH = "benchmark/run_benchmark.py"  # This script sends requests, delays are in apps
-NUM_REQUESTS_EXPECTED = 10000
+NUM_REQUESTS_EXPECTED = 1000
 PYTHON_EXE = sys.executable
 
 # ------------------------------------------------------------------------
@@ -121,20 +121,23 @@ def run_benchmark_script(framework_arg):
                     if not line: 
                         continue
 
-                    if line.startswith("REQ_STATUS:FASTAPI_TASK_LAUNCHED_"):
-                        # Extract count if needed, or just increment
-                        # current_task_num_str = line.split('_')[-1]
-                        # requests_done_count = int(current_task_num_str)
-                        requests_done_count += 1 # Increment for each launched task
-                        # Using carriage return to update the line in place
-                        print(f"\rFastAPI progress: Launched {requests_done_count}/{NUM_REQUESTS_EXPECTED} tasks...", end="", flush=True)
+                    if line.startswith("REQ_STATUS:FASTAPI_TASK_COMPLETED_"):
+                        # Extract count from the message, e.g., FASTAPI_TASK_COMPLETED_123
+                        try:
+                            current_task_num_str = line.split('_')[-1]
+                            requests_done_count = int(current_task_num_str)
+                        except (IndexError, ValueError):
+                            # Fallback if parsing fails, though it shouldn't with the new format
+                            requests_done_count += 1 
+                        print(f"\rFastAPI progress: Completed {requests_done_count}/{NUM_REQUESTS_EXPECTED} tasks...", end="", flush=True)
                         progress_line_printed = True
                     elif line.startswith("[DIAG-BRB-FASTAPI]"): # Placeholder for potential future diagnostics
                         if progress_line_printed:
                             print("\r" + " " * 80 + "\r", end="", flush=True) 
                         print(line, flush=True)
                         if progress_line_printed:
-                            print(f"\rFastAPI progress: Launched {requests_done_count}/{NUM_REQUESTS_EXPECTED} tasks...", end="", flush=True)
+                            # Reprint the progress line after diagnostic output
+                            print(f"\rFastAPI progress: Completed {requests_done_count}/{NUM_REQUESTS_EXPECTED} tasks...", end="", flush=True)
                     elif "FastAPI benchmark:" in line: # Updated to match FastAPI summary line
                         final_summary_line = line
                         if progress_line_printed:
