@@ -222,12 +222,12 @@ def display_table(rows):
 SCENARIOS = [
     {
         "name": "FastAPI (No Delay)",
-        "config": "Uvicorn, async (1 worker, httptools)",
+        "config": "Uvicorn, async (1 worker, h11)",
         "delay": "None",
         "cmd": ["uvicorn", "app_fastapi.FastAPI_no_delay:app", "--host", "0.0.0.0",
                 "--port", "8000", "--log-level", "warning", 
                 "--workers", "1",
-                "--http", "httptools"
+                "--http", "h11"
                ],
         "url": FASTAPI_SERVER_URL,
         "bench_arg": "fastapi",
