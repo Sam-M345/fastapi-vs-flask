@@ -5,6 +5,7 @@ pytest==8.3.5
 httpx==0.28.1
 requests==2.32.3
 rich==14.0.0
+pytest-asyncio==1.0.0
 
 # Optional, as per TDD plan:
 # tenacity

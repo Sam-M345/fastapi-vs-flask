@@ -15,6 +15,7 @@ ENV/
 .idea/
 .vscode/
 *.swp
+.cursor/
 
 # OS-specific
 .DS_Store
@@ -40,3 +41,8 @@ dist/
 
 # Other misc
 *.pem
+
+# Auto-generated documentation files
+Design Docs/File_Tree.txt
+Design Docs/
+SOP/
