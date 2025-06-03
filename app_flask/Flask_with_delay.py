@@ -2,8 +2,13 @@ from flask import Flask, Response
 import time
 import webbrowser
 from datetime import datetime # Added for timestamping
+import logging # Added import
 
 app = Flask(__name__)
+
+# Disable Werkzeug's default logger
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 request_counter = 0 # Global counter
 
@@ -14,13 +19,13 @@ def home():
     request_counter = request_id
 
     start_time = datetime.now()
-    print(f"[Flask Server] Request {request_id} received at {start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}")
+    # print(f"[Flask Server] Request {request_id} received at {start_time.strftime('%Y-%m-%d %H:%M:%S.%f')}") # Removed this line
     
     time.sleep(0.3)                # simulate slow work
     
     end_time = datetime.now()
     processing_time = (end_time - start_time).total_seconds()
-    print(f"[Flask Server] Request {request_id} finishing at {end_time.strftime('%Y-%m-%d %H:%M:%S.%f')}, processed in {processing_time:.2f}s")
+    print(f"[Flask Server] Request {request_id} processed in {processing_time:.2f}s - OK") # Kept and simplified this line, and added - OK
     
     html = f"<h1>Flask Server: Request {request_id} processed in {processing_time:.2f}s</h1>" # Updated content
     return Response(html, mimetype="text/html")
