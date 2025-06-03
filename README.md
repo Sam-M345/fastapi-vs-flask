@@ -24,12 +24,10 @@ Hacker Dojo/
 ├── benchmark/                # Core benchmark script
 │   └── run_benchmark.py
 ├── Design Docs/              # (Placeholder for design documents)
-├── project/                  # (Purpose to be clarified)
 ├── SOP/                      # Standard Operating Procedures & Handoff notes
 ├── static/                   # (Placeholder for static assets)
 ├── tests/                    # (Placeholder for automated tests)
 ├── .gitignore                # Files and directories ignored by Git
-├── custom.css                # (Purpose to be clarified)
 ├── README.md                 # This file
 ├── requirements.txt          # Python dependencies
 ├── run_benchmark_NO_RESTRICTIONS.py # Runs benchmarks for no-delay apps
