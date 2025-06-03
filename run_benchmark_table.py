@@ -24,9 +24,9 @@ def start_server(command_args, health_check_url, server_name, cwd=None):
     console.print(f"[yellow]Starting {server_name} server…[/yellow]")
 
     # --- STREAM HANDLING: inherit console so the child can always write
-    popen_kwargs = dict(cwd=cwd, text=True,
-                        stdout=subprocess.DEVNULL,
-                        stderr=subprocess.STDOUT)
+    popen_kwargs = dict(cwd=cwd, text=True)
+                        # stdout=subprocess.DEVNULL,  # Temporarily allow stdout
+                        # stderr=subprocess.STDOUT    # Temporarily allow stderr
 
     # run either as  "python -m uvicorn ..."  or plain exe
     if "uvicorn" in command_args[0] and not command_args[0].endswith(".exe"):
@@ -196,10 +196,10 @@ def display_table(rows):
 SCENARIOS = [
     {
         "name": "FastAPI",
-        "config": "Uvicorn, async",
+        "config": "Uvicorn, async (default worker, h11, debug log)",
         "delay": "0.3 s asyncio.sleep",
-        "cmd": ["uvicorn", "app_fastapi.app:app", "--host", "0.0.0.0",
-                "--port", "8000", "--log-level", "warning"],
+        "cmd": ["uvicorn", "app_fastapi.FastAPI_with_delay:app", "--host", "0.0.0.0",
+                "--port", "8000", "--log-level", "debug", "--http", "h11"],
         "url": FASTAPI_SERVER_URL,
         "bench_arg": "fastapi",
     },
@@ -207,7 +207,7 @@ SCENARIOS = [
         "name": "Flask",
         "config": "Single-threaded, synchronous",
         "delay": "0.3 s time.sleep",
-        "cmd": [PYTHON_EXE, "app_flask/flask_application.py"],
+        "cmd": [PYTHON_EXE, "app_flask/Flask_with_delay.py"],
         "url": FLASK_SERVER_URL,
         "bench_arg": "flask",
     }

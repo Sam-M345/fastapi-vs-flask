@@ -222,20 +222,23 @@ def display_table(rows):
 SCENARIOS = [
     {
         "name": "FastAPI (No Delay)",
-        "config": "Uvicorn, async (41 workers)",
+        "config": "Uvicorn, async (1 worker, httptools)",
         "delay": "None",
-        "cmd": ["uvicorn", "app_fastapi.app_no_delay:app", "--host", "0.0.0.0",
-                "--port", "8000", "--log-level", "warning", "--workers", "41"],
+        "cmd": ["uvicorn", "app_fastapi.FastAPI_no_delay:app", "--host", "0.0.0.0",
+                "--port", "8000", "--log-level", "warning", 
+                "--workers", "1",
+                "--http", "httptools"
+               ],
         "url": FASTAPI_SERVER_URL,
-        "bench_arg": "fastapi", # benchmark/run_benchmark.py uses this to pick the URL/method
+        "bench_arg": "fastapi",
     },
     {
         "name": "Flask (No Delay, Threaded)",
         "config": "Werkzeug (threaded=True)",
         "delay": "None",
-        "cmd": [PYTHON_EXE, "app_flask/flask_application_no_delay.py"],
+        "cmd": [PYTHON_EXE, "app_flask/Flask_no_delay.py"],
         "url": FLASK_SERVER_URL,
-        "bench_arg": "flask", # benchmark/run_benchmark.py uses this to pick the URL/method
+        "bench_arg": "flask",
     }
 ]
 
