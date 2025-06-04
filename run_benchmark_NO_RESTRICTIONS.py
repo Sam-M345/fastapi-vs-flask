@@ -11,7 +11,7 @@ import os
 # --- Configuration ------------------------------------------------------
 FLASK_SERVER_URL = "http://127.0.0.1:3000/"
 FASTAPI_SERVER_URL = "http://127.0.0.1:8000/"
-BENCHMARK_SCRIPT_PATH = "benchmark/run_benchmark.py"  # This script sends requests, delays are in apps
+BENCHMARK_SCRIPT_PATH = "benchmark/run_benchmark.py"  # This script sends requests,  delays are in apps
 NUM_REQUESTS_EXPECTED = 1000
 PYTHON_EXE = sys.executable
 
