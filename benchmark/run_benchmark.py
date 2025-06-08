@@ -63,7 +63,7 @@ async def run_fastapi_benchmark_async(num_requests):
     results_list = [] # To store results for final count
     
     # Configure httpx limits
-    limits = httpx.Limits(max_connections=500, max_keepalive_connections=50)
+    limits = httpx.Limits(max_connections=1000, max_keepalive_connections=50)
     async with httpx.AsyncClient(limits=limits) as client:
         tasks = [fetch_url_async(client, FASTAPI_URL) for _ in range(num_requests)]
         
